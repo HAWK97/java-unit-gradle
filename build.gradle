@@ -35,6 +35,10 @@ jacocoTestReport {
 	}
 }
 
+repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

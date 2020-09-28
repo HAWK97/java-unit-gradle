@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.testservice.demo.dao.BookMapper">
+  <resultMap id="BaseResultMap" type="com.inspur.testservice.demo.domain.Book">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="bookname" jdbcType="VARCHAR" property="bookname" />
+    <result column="price" jdbcType="NUMERIC" property="price" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, bookname, price
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from book
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from book
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inspur.testservice.demo.domain.Book">
+    insert into book (id, bookname, price
+      )
+    values (#{id,jdbcType=INTEGER}, #{bookname,jdbcType=VARCHAR}, #{price,jdbcType=NUMERIC}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.inspur.testservice.demo.domain.Book">
+    insert into book
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bookname != null">
+        bookname,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="bookname != null">
+        #{bookname,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inspur.testservice.demo.domain.Book">
+    update book
+    <set>
+      <if test="bookname != null">
+        bookname = #{bookname,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inspur.testservice.demo.domain.Book">
+    update book
+    set bookname = #{bookname,jdbcType=VARCHAR},
+      price = #{price,jdbcType=NUMERIC}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

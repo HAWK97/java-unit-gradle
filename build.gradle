@@ -1,0 +1,103 @@
+buildscript {
+	repositories {
+		maven {
+			url 'http://repo.inspur.com:80/artifactory/gradle-testcenter'
+			credentials {
+				username = "${artifactory_user}"
+				password = "${artifactory_password}"
+			}
+		}
+	}
+	dependencies {
+		classpath "gradle.plugin.com.arenagod.gradle:mybatis-generator-plugin:1.4"
+		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'java'
+	id "com.arenagod.gradle.MybatisGenerator" version "1.4"
+
+}
+
+apply plugin: "com.arenagod.gradle.MybatisGenerator"
+
+apply plugin: 'io.spring.dependency-management'
+
+apply plugin: 'jacoco'
+
+
+
+group = 'com.inspur'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+allprojects {
+	apply plugin: "com.jfrog.artifactory"
+}
+
+artifactory {
+	contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+	publish {
+		repository {
+			repoKey = 'libs-release-local'
+			username = "${artifactory_user}"
+			password = "${artifactory_password}"
+			maven = true
+
+		}
+	}
+	resolve {
+		repository {
+			repoKey = 'libs-snapshot'
+			username = "${artifactory_user}"
+			password = "${artifactory_password}"
+			maven = true
+
+		}
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+		html.enabled true
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//JDBC引入
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.0.0'
+	compile 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	//分页插件
+	implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.5'
+	//mybatis-generator core 包
+	compile group: 'org.mybatis.generator', name: 'mybatis-generator-core', version:'1.3.2'
+
+	mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.3.2'
+	mybatisGenerator 'org.postgresql:postgresql'
+	mybatisGenerator 'tk.mybatis:mapper:3.3.1'
+
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+	
+	//spring security and keycloak
+	compile group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '4.8.3.Final'
+//	compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '4.8.3.Final'
+
+}
+configurations {
+	mybatisGenerator
+}
+// mybatis-generator.xml 配置路径
+//这里会遇到个问题：MyBatis Generator 通过xml生成，有日志但是没有生成文件成功的问题，
+//原因：mac下是找不到 ./src 路径的，需要全路径，如下配置。windows则为src/main/resources/generator.xml
+mybatisGenerator {
+	verbose = true
+	configFile = 'src/main/resources/generator.xml'
+}
